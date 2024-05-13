@@ -46,12 +46,27 @@ namespace VolumeLibrary
                 Debug.WriteLine(command.ToString());
                 headset.Volume = command.SliderValues[0];
                 speakers.Volume = command.SliderValues[1];
-                microphone.Volume = command.SliderValues[2];
+                // microphone.Volume = command.SliderValues[2];
+                SetAppVolume(command.SliderValues[2]);
                 Rebalance(command.SliderValues[3]);
             }
             return string.Empty;
         }
 
+        public void SetAppVolume(int volume)
+        {
+            var sessionController = controller.DefaultPlaybackDevice.SessionController;
+            var sessions = sessionController.ActiveSessions();
+            IAudioSession app = null;
+            foreach (var i in sessions)
+            {
+                if (i.DisplayName.Equals("Spotify"))
+                {
+                    i.Volume = volume;
+                }
+            }
+
+        }
 
         public void Rebalance (int balance)
         {
@@ -64,7 +79,7 @@ namespace VolumeLibrary
                 if (i.DisplayName.Equals("Discord", StringComparison.InvariantCultureIgnoreCase))
                 {
                     discord = i;
-                } else 
+                } else  if (!i.DisplayName.Equals("Spotify")) 
                 { 
                     others.Add(i); 
                 }
