@@ -33,13 +33,13 @@ namespace VolumeLibrary
                         port.WriteTimeout = 100;
                         port.Encoding = Encoding.ASCII;
                         port.Open();
-                        port.WriteLine("Bye");
+                        port.WriteLine(CommandStrings.Stop);
                         port.DiscardInBuffer();
-                        port.WriteLine("Hello");
+                        port.WriteLine(CommandStrings.Start);
 
                         port.ReadTimeout = -1;
                         string ack = GetLine();
-                        if (ack == "Hi")
+                        if (ack == CommandStrings.Ack)
                         {
                             break;
                         }
@@ -53,7 +53,8 @@ namespace VolumeLibrary
                     }
                 }
             }
-            SendLine(CommandStrings.Refresh);
+            SendLine(CommandStrings.LedOn);
+            //SendLine(CommandStrings.Refresh);
         }
 
         public string GetLine()
@@ -91,8 +92,8 @@ namespace VolumeLibrary
                 {
                     try
                     {
-
-                        port.WriteLine("Bye");
+                        port.WriteLine(CommandStrings.LedOff);
+                        port.WriteLine(CommandStrings.Stop);
                     }
                     catch
                     {

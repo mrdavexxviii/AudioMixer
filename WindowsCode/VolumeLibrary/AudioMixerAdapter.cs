@@ -111,7 +111,7 @@ namespace VolumeLibrary
         public string GetLedState()
         {
             var currentDefault = controller.GetDefaultDevice(DeviceType.Playback, Role.Console);
-            return currentDefault == headset ? CommandStrings.LedOff : CommandStrings.LedOn;
+            return currentDefault == headset ? CommandStrings.Slider0ActiveLed : CommandStrings.Slider1ActiveLed;
         }
     }
 }
