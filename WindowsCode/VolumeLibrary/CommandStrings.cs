@@ -11,6 +11,7 @@ namespace VolumeLibrary
         internal static readonly string Start = "Hello";
         internal static readonly string Ack = "Hi";
         internal static readonly string Stop = "Bye";
+        internal static readonly string stayAwake = "Wake";
 
         internal static readonly string LedOff = "LED0";
         internal static readonly string LedOn = "LED1";

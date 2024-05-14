@@ -17,6 +17,8 @@ namespace VolumeLibrary
         IDevice microphone;
         IDevice speakers;
         IDevice headset;
+        string chatApp = string.Empty;
+        string musicApp = string.Empty;
         public void Init(Config config)
         {
             controller = new CoreAudioController();
@@ -25,7 +27,8 @@ namespace VolumeLibrary
             microphone = capturedevices.FirstOrDefault(x => x.FullName.Equals(config.MicrophoneInterface));
             speakers = outputDevices.FirstOrDefault(x => x.FullName.Equals(config.AudioInterface1));
             headset = outputDevices.FirstOrDefault(x => x.FullName.Equals(config.AudioInterface2));
-            
+            chatApp = config.ChatApp;
+            musicApp = config.MusicApp;
         }
         public string DoCommand(PortCommand command)
         {
@@ -43,7 +46,7 @@ namespace VolumeLibrary
                     }
                     return GetLedState();
                 }
-                Debug.WriteLine(command.ToString());
+            //    Debug.WriteLine(command.ToString());
                 headset.Volume = command.SliderValues[0];
                 speakers.Volume = command.SliderValues[1];
                 // microphone.Volume = command.SliderValues[2];
@@ -60,7 +63,7 @@ namespace VolumeLibrary
             IAudioSession app = null;
             foreach (var i in sessions)
             {
-                if (i.DisplayName.Equals("Spotify"))
+                if (i.DisplayName.Equals(musicApp, StringComparison.InvariantCultureIgnoreCase))
                 {
                     i.Volume = volume;
                 }
@@ -76,10 +79,10 @@ namespace VolumeLibrary
             List<IAudioSession> others = new List<IAudioSession>();
             foreach (var i in sessions)
             {
-                if (i.DisplayName.Equals("Discord", StringComparison.InvariantCultureIgnoreCase))
+                if (i.DisplayName.Equals(chatApp, StringComparison.InvariantCultureIgnoreCase))
                 {
                     discord = i;
-                } else  if (!i.DisplayName.Equals("Spotify")) 
+                } else  if (!i.DisplayName.Equals(musicApp)) 
                 { 
                     others.Add(i); 
                 }

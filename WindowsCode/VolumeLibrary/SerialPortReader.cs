@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO.Ports;
 using System.Linq;
 using System.Net.Security;
@@ -28,26 +29,31 @@ namespace VolumeLibrary
                 {
                     try
                     {
+                        Debug.WriteLine($"Attempting to init {i}");
                         port = new SerialPort(i, 9600, Parity.None, 8, StopBits.One);
                         port.ReadTimeout = 100;
                         port.WriteTimeout = 100;
                         port.Encoding = Encoding.ASCII;
                         port.Open();
                         port.WriteLine(CommandStrings.Stop);
+                        Debug.WriteLine($"{i} Stop Sent");
                         port.DiscardInBuffer();
                         port.WriteLine(CommandStrings.Start);
-
+                        Debug.WriteLine($"{i} Start Sent");
                         port.ReadTimeout = -1;
                         string ack = GetLine();
                         if (ack == CommandStrings.Ack)
                         {
+                            Debug.WriteLine($"{i} Acknowledged");
                             break;
                         }
+                        Debug.WriteLine($"{i} Failure to Acknowledge");
                         port.Dispose();
                         port = null;
                     }
                     catch
                     {
+                        Debug.WriteLine($"{i} threw exception");
                         port.Dispose();
                         port = null;
                     }
@@ -57,16 +63,24 @@ namespace VolumeLibrary
             //SendLine(CommandStrings.Refresh);
         }
 
+        public bool CanGetLine()
+        {
+            return port.BytesToRead > 0;
+        }
+
         public string GetLine()
         {
             try
             {
-                return port.ReadLine().TrimEnd('\r');
-            } catch
+                string retVal = port.ReadLine().TrimEnd('\r');
+                Debug.WriteLine($"Receiving: {retVal}");
+                return retVal;
+            }
+            catch
             {
                 Init();
-                return String.Empty;
             }
+            return String.Empty;
         }
 
         public void SendLine(string line)
@@ -76,8 +90,10 @@ namespace VolumeLibrary
                 try
                 {
                     port.WriteLine(line);
+                    Debug.WriteLine($"Send Successful : {line}");
                 } catch
                 {
+                    Debug.WriteLine($"Send failed: {line}");
                     Init();
                 }
             }
