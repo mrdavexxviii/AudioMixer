@@ -11,8 +11,6 @@ internal class Program
             Config config = new Config();
             AudioMixerAdapter adapter = new AudioMixerAdapter();
             adapter.Init(config);
-            DateTime NextPing = DateTime.UtcNow;
-            TimeSpan TimeBetweenPings = new TimeSpan(0, 0, 30);
 
             using (SerialPortReader reader = new SerialPortReader())
             {
@@ -32,11 +30,6 @@ internal class Program
                         Thread.Sleep(100);
                     }
 
-                    if (DateTime.UtcNow > NextPing)
-                    {
-                        reader.SendLine("Wake");
-                        NextPing = DateTime.UtcNow + TimeBetweenPings;
-                    }
                 }
             }
         }

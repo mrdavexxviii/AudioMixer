@@ -74,6 +74,10 @@ namespace VolumeLibrary
             {
                 string retVal = port.ReadLine().TrimEnd('\r');
                 Debug.WriteLine($"Receiving: {retVal}");
+                if (retVal == CommandStrings.stayAwake)// Internal keep alive
+                {
+                    SendLine(CommandStrings.stayAwake);
+                }
                 return retVal;
             }
             catch
