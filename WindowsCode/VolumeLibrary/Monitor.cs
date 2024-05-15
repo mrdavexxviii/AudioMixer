@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace VolumeLibrary
@@ -10,27 +11,55 @@ namespace VolumeLibrary
     {
         readonly SerialPortReader reader;
         private bool Running { get; set; } = false;
+        private Thread thread;
 
         public Monitor(Config config)
         {
             this.config = config;
             this.reader = new SerialPortReader();
         }
-        void a()
+        public void Run()
+        {
+            if (!Running)
+            {
+                ThreadStart start = new ThreadStart(InternalLoop);
+                thread = new Thread(start);
+                thread.Start();
+            }
+        }
+        public void Stop ()
+        {
+            Running = false;
+            if (thread != null)
+            {
+                while (thread.IsAlive)
+                {
+                    Thread.Sleep(1000);
+                }
+            }
+        }
+
+        private void InternalLoop()
         {
             AudioMixerAdapter adapter = new AudioMixerAdapter();
             adapter.Init(config);
 
-            
+
             reader.Init();
+            Running = true;
             reader.SendLine(adapter.GetLedState());
 
             while (Running)
             {
-                PortCommand command = new PortCommand(reader.GetLine());
-                string reply = adapter.DoCommand(command);
-                reader.SendLine(reply);
+                while (reader.CanGetLine())
+                {
+                    PortCommand command = new PortCommand(reader.GetLine());
+                    string reply = adapter.DoCommand(command);
+                    reader.SendLine(reply);
+                }
+                Thread.Sleep(100);
             }
+            reader.SendLine(CommandStrings.Stop);
         }
 
 
