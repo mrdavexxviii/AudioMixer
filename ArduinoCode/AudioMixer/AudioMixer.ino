@@ -2,23 +2,37 @@ const int SliderCount = 4;
 const int analogueInputs[SliderCount] = { A0, A1, A2, A3 };
 const int pin_Button = 2;
 const int pin_LEDState = 3;
+const int pin_LEDState_Sl0 = 4;
+const int pin_LEDState_Sl1 = 5;
 const int rounding = 10;
-const int StabilityValue = 5;
+const int StabilityValue = 20;
+const int HeartbeatPulse = 1000 * 60;
+const int HeartbeatPingAllowance = 5000;
+const long maxLong = 2147483647L;
 int currentValues[SliderCount] = {0,0,0,0};
 int changedValCount[SliderCount] = {100,100,100,100};
+long MustHaveHeartbeatBy;
+long NextHeartbeat = 0;
 bool buttonPressed = false;
 bool buttonSent = false;
 bool active = false;
+
 
 
 void setup() {
    for (int i = 0; i < SliderCount; i++) {
     pinMode(analogueInputs[i], INPUT);
   }
-
+  MustHaveHeartbeatBy = maxLong;
   pinMode(pin_Button,INPUT);
   pinMode(pin_LEDState,OUTPUT);
+  pinMode(pin_LEDState_Sl0,OUTPUT);
+  pinMode(pin_LEDState_Sl1,OUTPUT);
+  digitalWrite(pin_LEDState, LOW);
+  digitalWrite(pin_LEDState_Sl0, LOW);
+  digitalWrite(pin_LEDState_Sl1, LOW);
   active = false;
+
   Serial.begin(9600);
   
 }
@@ -95,32 +109,75 @@ void SendCommand()
 void SerialCommandHandler()
 {
   String myString = "";
-  if (Serial.available() > 0)
+  while (Serial.available() > 0)
   {
     myString = Serial.readStringUntil('\n');
     if (myString == "Hello")
     {
       active = true;
       GatedSendString("Hi");
+      SendCommand();
     }
     else if (myString == "Bye")
     {
-      active = false;
-    }
-    else if (myString == "Get")
+      Shutdown();
+    } else if (myString == "Beat")
     {
-      SendCommand();
+      MustHaveHeartbeatBy = maxLong;
     }
+    //else if (myString == "Get")
+    //{
+    //  SendCommand();
+    //}
     else if (myString == "LED0")
     {
       digitalWrite(pin_LEDState,LOW);
     } else if (myString == "LED1")
     {
       digitalWrite(pin_LEDState, HIGH);
+    } else if (myString == "Select_SL0")
+    {
+      digitalWrite(pin_LEDState_Sl0, HIGH);
+      digitalWrite(pin_LEDState_Sl1, LOW);
+    }else if (myString == "Select_SL1")
+    {
+      digitalWrite(pin_LEDState_Sl1, HIGH);
+      digitalWrite(pin_LEDState_Sl0,LOW);
     }
   }
 }
 
+void Shutdown()
+{
+      active = false;
+      digitalWrite(pin_LEDState,LOW);
+      digitalWrite(pin_LEDState_Sl0, LOW);
+      digitalWrite(pin_LEDState_Sl1, LOW);
+      NextHeartbeat = HeartbeatPulse;
+      MustHaveHeartbeatBy = maxLong;
+}
+
+void HandleHeartbeat()
+{
+  if (active)
+  {
+    if (millis() > NextHeartbeat)
+    {
+        GatedSendString("Beat");
+        MustHaveHeartbeatBy = millis() + HeartbeatPingAllowance;
+        NextHeartbeat = millis() + HeartbeatPulse;
+    }
+    if (millis() > MustHaveHeartbeatBy)
+    {
+        NextHeartbeat = millis() + HeartbeatPulse;
+        MustHaveHeartbeatBy = maxLong;
+        Shutdown();
+    }
+  } else {
+        Serial.println("Waiting");
+        delay(5000);
+  }
+}
 
 void loop() {
   // put your main code here, to run repeatedly:
@@ -130,6 +187,8 @@ void loop() {
   }
   updateButton();
   SerialCommandHandler();
+  HandleHeartbeat();
 }
+
 
 
