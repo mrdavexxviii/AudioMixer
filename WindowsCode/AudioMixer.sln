@@ -5,7 +5,9 @@ VisualStudioVersion = 17.9.34728.123
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "VolumeLibrary", "VolumeLibrary\VolumeLibrary.csproj", "{264AEA5F-4B70-44DD-BF0E-2658430E0EF0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tester", "Tester\Tester.csproj", "{8D3C47E6-2BE7-413D-8508-EEBD9FF0F2FF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tester", "Tester\Tester.csproj", "{8D3C47E6-2BE7-413D-8508-EEBD9FF0F2FF}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AudioBoxControl", "AudioBoxControl\AudioBoxControl.csproj", "{61632960-1C21-451D-9706-6062CF4B133E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +23,10 @@ Global
 		{8D3C47E6-2BE7-413D-8508-EEBD9FF0F2FF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8D3C47E6-2BE7-413D-8508-EEBD9FF0F2FF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8D3C47E6-2BE7-413D-8508-EEBD9FF0F2FF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{61632960-1C21-451D-9706-6062CF4B133E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{61632960-1C21-451D-9706-6062CF4B133E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{61632960-1C21-451D-9706-6062CF4B133E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{61632960-1C21-451D-9706-6062CF4B133E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
