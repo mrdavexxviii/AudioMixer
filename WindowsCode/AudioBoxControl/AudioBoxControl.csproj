@@ -74,5 +74,11 @@
   <ItemGroup>
     <None Include="Resources\AudioMixer.ico" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\VolumeLibrary\VolumeLibrary.csproj">
+      <Project>{264AEA5F-4B70-44DD-BF0E-2658430E0EF0}</Project>
+      <Name>VolumeLibrary</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

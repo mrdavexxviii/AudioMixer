@@ -2,8 +2,10 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using VolumeLibrary;
 
 namespace AudioBoxControl
 {
@@ -24,6 +26,7 @@ namespace AudioBoxControl
     public class ABCContext : ApplicationContext
     {
         private NotifyIcon icon;
+        private Monitor volumeMonitor;
 
         public ABCContext()
         {
@@ -36,12 +39,24 @@ namespace AudioBoxControl
                 }),
                 Visible = true
             };
+            volumeMonitor = new Monitor(new Config());
+            volumeMonitor.Run();
         }
 
         void Quit (object sender, EventArgs args)
         {
-            icon.Visible = false;
             Application.Exit();
+        }
+
+        protected override void Dispose(bool disposing)
+        {
+            icon.Visible = false;
+            if (volumeMonitor != null)
+            {
+                volumeMonitor.Stop();
+                volumeMonitor.Dispose();
+            }
+            base.Dispose(disposing);
         }
     }
 }
