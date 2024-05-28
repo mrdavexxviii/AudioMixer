@@ -1,3 +1,5 @@
+#include <LiquidCrystal_I2C.h>
+
 const int SliderCount = 4;
 const int analogueInputs[SliderCount] = { A0, A1, A2, A3 };
 const int pin_Button = 2;
@@ -17,7 +19,7 @@ bool buttonPressed = false;
 bool buttonSent = false;
 bool active = false;
 
-
+LiquidCrystal_I2C lcd(0x27,20,4);
 
 void setup() {
    for (int i = 0; i < SliderCount; i++) {
@@ -32,6 +34,9 @@ void setup() {
   digitalWrite(pin_LEDState_Sl0, LOW);
   digitalWrite(pin_LEDState_Sl1, LOW);
   active = false;
+  lcd.init();
+  lcd.noBacklight();
+  lcd.clear();
 
   Serial.begin(9600);
   
@@ -98,7 +103,9 @@ void SendCommand()
   String retVal = "";
    for (int i = 0; i < SliderCount; i++) {
     retVal += String(currentValues[i]);
-
+    lcd.setCursor(i * 4,0);
+    lcd.print(String(currentValues[i]));
+    lcd.print(" ");
     if (i < SliderCount - 1) {
       retVal += String("|");
     }
@@ -114,9 +121,7 @@ void SerialCommandHandler()
     myString = Serial.readStringUntil('\n');
     if (myString == "Hello")
     {
-      active = true;
-      GatedSendString("Hi");
-      SendCommand();
+      wakeUp();
     }
     else if (myString == "Bye")
     {
@@ -125,10 +130,6 @@ void SerialCommandHandler()
     {
       MustHaveHeartbeatBy = maxLong;
     }
-    //else if (myString == "Get")
-    //{
-    //  SendCommand();
-    //}
     else if (myString == "LED0")
     {
       digitalWrite(pin_LEDState,LOW);
@@ -139,12 +140,24 @@ void SerialCommandHandler()
     {
       digitalWrite(pin_LEDState_Sl0, HIGH);
       digitalWrite(pin_LEDState_Sl1, LOW);
+      lcd.setCursor(0,1);
+      lcd.print("Headset ");
     }else if (myString == "Select_SL1")
     {
       digitalWrite(pin_LEDState_Sl1, HIGH);
       digitalWrite(pin_LEDState_Sl0,LOW);
+      lcd.setCursor(0,1);
+      lcd.print("Speakers");
     }
   }
+}
+
+void wakeUp()
+{
+      active = true;
+      GatedSendString("Hi");
+      SendCommand();
+      lcd.backlight();
 }
 
 void Shutdown()
@@ -155,6 +168,8 @@ void Shutdown()
       digitalWrite(pin_LEDState_Sl1, LOW);
       NextHeartbeat = HeartbeatPulse;
       MustHaveHeartbeatBy = maxLong;
+      lcd.noBacklight();
+      lcd.clear();
 }
 
 void HandleHeartbeat()
@@ -187,7 +202,7 @@ void loop() {
   }
   updateButton();
   SerialCommandHandler();
-  HandleHeartbeat();
+ // HandleHeartbeat();
 }
 
 
